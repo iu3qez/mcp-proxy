@@ -50,6 +50,7 @@ services:
       - "traefik.http.routers.mcp-health.entrypoints=websecure"
       - "traefik.http.routers.mcp-health.tls.certresolver=letsencrypt"
       - "traefik.http.routers.mcp-health.priority=100"
+      - "traefik.http.routers.mcp-health.service=mcp"
     networks:
       - proxy
 
