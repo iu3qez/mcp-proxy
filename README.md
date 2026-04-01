@@ -1,13 +1,10 @@
 # MCP Proxy
 
-Docker Compose setup that exposes stdio-only MCP servers as authenticated SSE endpoints.
+> Personal project — Docker Compose setup to expose stdio-only MCP servers as authenticated SSE endpoints from a self-hosted VPS.
 
 ## What it does
 
-Many MCP servers only support stdio transport. This project wraps them with
-[mcp-proxy](https://github.com/sparfenyuk/mcp-proxy) and exposes them over
-HTTPS with bearer token authentication, so remote SSE clients (Claude Desktop,
-sandbox environments, etc.) can use them.
+Many MCP servers only support stdio transport and cannot be consumed by remote clients directly. This project wraps them with [mcp-proxy](https://github.com/sparfenyuk/mcp-proxy) and exposes them over HTTPS with bearer token authentication, so any SSE-capable client (Claude Desktop, sandbox environments, coworking machines, etc.) can connect without needing local installations.
 
 ## Quick start
 
