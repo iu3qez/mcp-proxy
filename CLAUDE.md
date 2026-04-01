@@ -41,6 +41,13 @@ curl -H "Authorization: Bearer $BEARER_TOKEN" https://$DOMAIN/servers/parcel/sse
 4. Add env vars to `.env` and `.env.example`
 5. `docker compose up -d --build`
 
+## Infrastructure Notes
+
+- Base image `ghcr.io/sparfenyuk/mcp-proxy` is Alpine — use `apk`, not `apt`
+- `traefik-plugin-apikey`: module `github.com/Gerardwx/traefik-plugin-apikey` v0.2.1
+- Every Traefik router needs an explicit `service` label even with a single service
+- `servers.json` top-level key must be `mcpServers` (not `servers`)
+
 ## config.json Path Gotcha
 
 `parcel-tracking-mcp-server` reads `config.json` from `__dirname` (next to `index.mjs`),
