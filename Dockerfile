@@ -9,9 +9,9 @@ RUN apk add --no-cache nodejs
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 
 # Install parcel-tracking-mcp-server to a fixed path
-# entrypoint.sh writes config.json to /opt/mcp-packages/node_modules/parcel-tracking-mcp-server/
+# entrypoint.sh writes config.json to /opt/mcp-packages/node_modules/parcel-mcp/
 ENV MCP_PACKAGES_DIR=/opt/mcp-packages
-RUN mkdir -p $MCP_PACKAGES_DIR && cd $MCP_PACKAGES_DIR && bun add parcel-tracking-mcp-server
+RUN mkdir -p $MCP_PACKAGES_DIR && cd $MCP_PACKAGES_DIR && bun add parcel-mcp
 
 COPY servers.json /app/servers.json
 COPY entrypoint.sh /app/entrypoint.sh

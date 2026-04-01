@@ -6,7 +6,7 @@ set -e
 # NOT from the working directory. Package is installed to a fixed path
 # in the Dockerfile: $MCP_PACKAGES_DIR/node_modules/parcel-tracking-mcp-server/
 
-PARCEL_PKG_DIR="/opt/mcp-packages/node_modules/parcel-tracking-mcp-server"
+PARCEL_PKG_DIR="/opt/mcp-packages/node_modules/parcel-mcp"
 
 if [ -z "$TRACKING_API_TOKEN" ]; then
   echo "ERROR: TRACKING_API_TOKEN is not set" >&2
