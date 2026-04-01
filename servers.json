@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "parcel": {
-      "command": "parcel-tracking-mcp-server",
-      "args": []
+      "command": "bun",
+      "args": ["/opt/mcp-packages/node_modules/parcel-tracking-mcp-server/index.mjs"]
     }
   }
 }

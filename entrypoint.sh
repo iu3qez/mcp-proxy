@@ -3,10 +3,10 @@ set -e
 
 # --- parcel-tracking-mcp-server config ---
 # The package reads config.json from __dirname (next to index.mjs),
-# NOT from the working directory. We must write it to the global
-# npm install path.
+# NOT from the working directory. Package is installed to a fixed path
+# in the Dockerfile: $MCP_PACKAGES_DIR/node_modules/parcel-tracking-mcp-server/
 
-PARCEL_PKG_DIR="$(npm root -g)/parcel-tracking-mcp-server"
+PARCEL_PKG_DIR="/opt/mcp-packages/node_modules/parcel-tracking-mcp-server"
 
 if [ -z "$TRACKING_API_TOKEN" ]; then
   echo "ERROR: TRACKING_API_TOKEN is not set" >&2
@@ -15,7 +15,7 @@ fi
 
 if [ ! -d "$PARCEL_PKG_DIR" ]; then
   echo "ERROR: parcel-tracking-mcp-server not found at $PARCEL_PKG_DIR" >&2
-  echo "       Was it installed globally in the Dockerfile?" >&2
+  echo "       Was it installed in the Dockerfile?" >&2
   exit 1
 fi
 

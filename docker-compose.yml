@@ -1,59 +1,35 @@
-services:
-  traefik:
-    image: traefik:v3.4
-    restart: unless-stopped
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      # HTTP -> HTTPS redirect
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      # Let's Encrypt
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
-      # Plugin: traefik-plugin-apikey
-      - "--experimental.plugins.apikey.modulename=github.com/Gerardwx/traefik-plugin-apikey"
-      - "--experimental.plugins.apikey.version=v0.2.1"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/acme.json:/acme.json
-    networks:
-      - proxy
+name: mcp-proxy
 
+networks:
+  traefik:
+    external: true
+    name: traefik
+
+services:
   mcp-proxy:
     build: .
+    container_name: mcp-proxy
     restart: unless-stopped
     environment:
       - TRACKING_API_TOKEN=${TRACKING_API_TOKEN}
+    networks:
+      - traefik
     labels:
       - "traefik.enable=true"
-      # Main router (all traffic, requires auth)
-      - "traefik.http.routers.mcp.rule=Host(`${DOMAIN}`)"
-      - "traefik.http.routers.mcp.entrypoints=websecure"
-      - "traefik.http.routers.mcp.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.mcp.middlewares=mcp-auth"
+      # Main router — requires bearer token auth
+      - "traefik.http.routers.mcp-rtr.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.mcp-rtr.entrypoints=websecure"
+      - "traefik.http.routers.mcp-rtr.middlewares=mcp-auth"
+      - "traefik.http.routers.mcp-rtr.service=mcp-svc"
       # Service
-      - "traefik.http.services.mcp.loadbalancer.server.port=8080"
+      - "traefik.http.services.mcp-svc.loadbalancer.server.port=8080"
       # Middleware: bearer token auth via traefik-plugin-apikey
       - "traefik.http.middlewares.mcp-auth.plugin.apikey.keySource=header"
       - "traefik.http.middlewares.mcp-auth.plugin.apikey.headerName=Authorization"
       - "traefik.http.middlewares.mcp-auth.plugin.apikey.headerValuePrefix=Bearer "
       - "traefik.http.middlewares.mcp-auth.plugin.apikey.keys=${BEARER_TOKEN}"
-      # Health check router (no auth, higher priority)
-      - "traefik.http.routers.mcp-health.rule=Host(`${DOMAIN}`) && Path(`/status`)"
-      - "traefik.http.routers.mcp-health.entrypoints=websecure"
-      - "traefik.http.routers.mcp-health.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.mcp-health.priority=100"
-      - "traefik.http.routers.mcp-health.service=mcp"
-    networks:
-      - proxy
-
-networks:
-  proxy:
-    driver: bridge
+      # Health check router — no auth, higher priority
+      - "traefik.http.routers.mcp-health-rtr.rule=Host(`${DOMAIN}`) && Path(`/status`)"
+      - "traefik.http.routers.mcp-health-rtr.entrypoints=websecure"
+      - "traefik.http.routers.mcp-health-rtr.priority=20"
+      - "traefik.http.routers.mcp-health-rtr.service=mcp-svc"
